@@ -354,7 +354,7 @@ export function EventForm({ event, onSave, onCancel, isOpen }: EventFormProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Event Type *</label>
-                <Select value={formData.type} onValueChange={(value) => handleInputChange("type", value)} eventTypeLabels={eventTypeLabels}>
+                <Select value={formData.type || "workshop"} onValueChange={(value) => handleInputChange("type", value)} eventTypeLabels={eventTypeLabels}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select event type" />
                   </SelectTrigger>
@@ -376,7 +376,7 @@ export function EventForm({ event, onSave, onCancel, isOpen }: EventFormProps) {
 
               <div className="space-y-2">
                 <label className="text-sm font-medium">Status *</label>
-                <Select value={formData.status} onValueChange={(value) => handleInputChange("status", value)}>
+                <Select value={formData.status || "upcoming"} onValueChange={(value) => handleInputChange("status", value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
@@ -447,7 +447,7 @@ export function EventForm({ event, onSave, onCancel, isOpen }: EventFormProps) {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Mode</label>
-                  <Select value={formData.mode} onValueChange={(value) => handleInputChange("mode", value)}>
+                  <Select value={formData.mode || "In-person"} onValueChange={(value) => handleInputChange("mode", value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select mode" />
                     </SelectTrigger>

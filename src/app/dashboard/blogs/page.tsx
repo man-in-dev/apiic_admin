@@ -67,7 +67,7 @@ export default function BlogsManagementPage() {
       await updateBlog(editingId, { title, content, coverImage, tags, status });
       setEditingId(null);
     } else {
-      await createBlog({ id: '' as any, title, content, coverImage, tags, status, isActive: true });
+      await createBlog({ title, content, coverImage, tags, status, isActive: true });
       setShowForm(false);
     }
   };

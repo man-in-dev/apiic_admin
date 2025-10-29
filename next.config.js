@@ -11,6 +11,13 @@ const nextConfig = {
             },
         ]
     },
+    experimental: {
+        optimizePackageImports: ['lucide-react'],
+    },
+    // Handle font loading more gracefully
+    optimizeFonts: true,
+    // Skip font optimization during build if network issues
+    skipTrailingSlashRedirect: true,
 }
 
 module.exports = nextConfig

@@ -18,8 +18,9 @@ import {
 export interface Program {
   id: string;
   title: string;
-  duration: string; // e.g., "3-6 months"
+  duration?: string; // e.g., "3-6 months"
   bullets: string[];
+  isActive?: boolean;
 }
 
 import { usePrograms } from "@/hooks/usePrograms";
