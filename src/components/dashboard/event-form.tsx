@@ -198,6 +198,7 @@ export function EventForm({ event, onSave, onCancel, isOpen }: EventFormProps) {
     date: event?.date || "",
     type: event?.type || "workshop",
     venue: event?.venue || "",
+    link: event?.link || "",
     speaker: event?.speaker || "",
     mode: event?.mode || "In-person",
     audience: event?.audience || "",
@@ -226,6 +227,7 @@ export function EventForm({ event, onSave, onCancel, isOpen }: EventFormProps) {
       date: event?.date || "",
       type: (event?.type as EventType) || "workshop",
       venue: event?.venue || "",
+      link: event?.link || "",
       speaker: event?.speaker || "",
       mode: (event?.mode as any) || "In-person",
       audience: event?.audience || "",
@@ -266,6 +268,7 @@ export function EventForm({ event, onSave, onCancel, isOpen }: EventFormProps) {
       date: formData.date,
       type: formData.type as EventType,
       venue: formData.venue,
+      link: formData.link,
       speaker: formData.speaker,
       mode: formData.mode as "In-person" | "Online" | "Hybrid",
       audience: formData.audience,
@@ -291,7 +294,7 @@ export function EventForm({ event, onSave, onCancel, isOpen }: EventFormProps) {
   };
 
   const getFieldsForEventType = (type: EventType) => {
-    const baseFields = ["title", "description", "date", "venue", "status"];
+    const baseFields = ["title", "description", "date", "venue", "link", "status"];
     
     switch (type) {
       case "workshop":
@@ -418,6 +421,17 @@ export function EventForm({ event, onSave, onCancel, isOpen }: EventFormProps) {
                   onChange={(e) => handleInputChange("date", e.target.value)}
                 />
               </div>
+
+              {visibleFields.includes("link") && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Link</label>
+                  <Input
+                    value={formData.link}
+                    onChange={(e) => handleInputChange("link", e.target.value)}
+                    placeholder="Enter registration or event link (optional)"
+                  />
+                </div>
+              )}
 
               {visibleFields.includes("venue") && (
                 <div className="space-y-2">

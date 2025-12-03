@@ -20,7 +20,8 @@ import {
   Video,
   Bell,
   Loader2,
-  AlertCircle
+  AlertCircle,
+  X
 } from "lucide-react";
 // import {
 //   Select,
@@ -197,6 +198,7 @@ export default function EventsManagementPage() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [viewEvent, setViewEvent] = useState<Event | null>(null);
 
   // Build stable query params
   const eventQuery = useMemo(() => ({
@@ -255,6 +257,7 @@ export default function EventsManagementPage() {
     date: e.date,
     type: e.type,
     venue: e.venue,
+    link: (e as any).link,
     speaker: e.speaker,
     mode: e.mode,
     audience: e.audience,
@@ -298,6 +301,10 @@ export default function EventsManagementPage() {
 
   const handleEditEvent = (event: Event) => {
     setEditingEvent(event);
+  };
+
+  const handleViewEvent = (event: Event) => {
+    setViewEvent(event);
   };
 
   const handleDeleteEvent = async (eventId: string) => {
@@ -459,78 +466,109 @@ export default function EventsManagementPage() {
         </div>
       ) : (
         <>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {events.map((event) => {
-              const IconComponent = eventTypeIcons[event.type] || Calendar;
-              return (
-                <Card key={event.id} className="hover:shadow-lg transition-shadow">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-2">
-                        <IconComponent className="h-5 w-5 text-primary" />
-                        <Badge variant="secondary" className="text-xs">
-                          {eventTypeLabels[event.type]}
+          <div className="overflow-x-auto rounded-md border">
+            <table className="min-w-full text-sm">
+              <thead className="bg-muted">
+                <tr className="text-left">
+                  <th className="px-4 py-2">Type</th>
+                  <th className="px-4 py-2">Title & Description</th>
+                  <th className="px-4 py-2">Date</th>
+                  <th className="px-4 py-2">Venue</th>
+                  <th className="px-4 py-2">Speaker</th>
+                  <th className="px-4 py-2">Duration</th>
+                  <th className="px-4 py-2">Status</th>
+                  <th className="px-4 py-2 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {events.map((event) => {
+                  const IconComponent = eventTypeIcons[event.type] || Calendar;
+                  return (
+                    <tr key={event.id} className="border-t hover:bg-muted/40">
+                      <td className="px-4 py-2 align-top">
+                        <div className="flex items-center gap-2">
+                          <IconComponent className="h-4 w-4 text-primary" />
+                          <span className="text-xs font-medium">
+                            {eventTypeLabels[event.type]}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-2 align-top">
+                        <div className="font-medium line-clamp-1">{event.title}</div>
+                        <div className="text-xs text-muted-foreground line-clamp-2">
+                          {event.description}
+                        </div>
+                      </td>
+                      <td className="px-4 py-2 align-top text-sm text-muted-foreground">
+                        <div className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          {formatDate(event.date)}
+                        </div>
+                      </td>
+                      <td className="px-4 py-2 align-top text-sm text-muted-foreground">
+                        {event.venue && (
+                          <div className="flex items-center gap-1">
+                            <MapPin className="h-3 w-3" />
+                            <span className="line-clamp-1">{event.venue}</span>
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-4 py-2 align-top text-sm text-muted-foreground">
+                        {event.speaker && (
+                          <div className="flex items-center gap-1">
+                            <Users className="h-3 w-3" />
+                            <span className="line-clamp-1">{event.speaker}</span>
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-4 py-2 align-top text-sm text-muted-foreground">
+                        {event.duration && (
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            <span>{event.duration}</span>
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-4 py-2 align-top">
+                        <Badge className={`text-xs ${getStatusColor(event.status)}`}>
+                          {event.status}
                         </Badge>
-                      </div>
-                      <Badge className={`text-xs ${getStatusColor(event.status)}`}>
-                        {event.status}
-                      </Badge>
-                    </div>
-                    <CardTitle className="text-lg overflow-hidden text-ellipsis">{event.title}</CardTitle>
-                    <CardDescription className="overflow-hidden text-ellipsis">
-                      {event.description}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="space-y-2 mb-4">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Calendar className="h-4 w-4" />
-                        {formatDate(event.date)}
-                      </div>
-                      {event.venue && (
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <MapPin className="h-4 w-4" />
-                          {event.venue}
+                      </td>
+                      <td className="px-4 py-2 align-top">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleViewEvent(event)}
+                            disabled={loading}
+                          >
+                            View
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEditEvent(event)}
+                            disabled={loading}
+                          >
+                            <Edit className="mr-1 h-4 w-4" />
+                            Edit
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-red-600 hover:text-red-700"
+                            onClick={() => handleDeleteEvent(event.id)}
+                            disabled={loading}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </div>
-                      )}
-                      {event.speaker && (
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Users className="h-4 w-4" />
-                          {event.speaker}
-                        </div>
-                      )}
-                      {event.duration && (
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Clock className="h-4 w-4" />
-                          {event.duration}
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="flex-1"
-                        onClick={() => handleEditEvent(event)}
-                        disabled={loading}
-                      >
-                        <Edit className="mr-2 h-4 w-4" />
-                        Edit
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="text-red-600 hover:text-red-700"
-                        onClick={() => handleDeleteEvent(event.id)}
-                        disabled={loading}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
 
           {events.length === 0 && !loading && (
@@ -589,6 +627,89 @@ export default function EventsManagementPage() {
         onCancel={handleCancelForm}
         isOpen={showAddForm || !!editingEvent}
       />
+
+      {/* View Event Modal */}
+      {viewEvent && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5" />
+                  {viewEvent.title}
+                </CardTitle>
+                <CardDescription>
+                  {viewEvent.type && eventTypeLabels[viewEvent.type as EventType]} •{" "}
+                  {formatDate(viewEvent.date)}
+                </CardDescription>
+              </div>
+              <Button variant="ghost" size="icon" onClick={() => setViewEvent(null)}>
+                <X className="h-4 w-4" />
+              </Button>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <h3 className="text-sm font-semibold mb-1">Description</h3>
+                <p className="text-sm text-muted-foreground whitespace-pre-line">
+                  {viewEvent.description}
+                </p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div className="space-y-1">
+                  <p><span className="font-semibold">Status:</span> {viewEvent.status}</p>
+                  {viewEvent.venue && (
+                    <p><span className="font-semibold">Venue:</span> {viewEvent.venue}</p>
+                  )}
+                  {viewEvent.speaker && (
+                    <p><span className="font-semibold">Speaker:</span> {viewEvent.speaker}</p>
+                  )}
+                  {viewEvent.mode && (
+                    <p><span className="font-semibold">Mode:</span> {viewEvent.mode}</p>
+                  )}
+                  {viewEvent.duration && (
+                    <p><span className="font-semibold">Duration:</span> {viewEvent.duration}</p>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  {viewEvent.audience && (
+                    <p><span className="font-semibold">Audience:</span> {viewEvent.audience}</p>
+                  )}
+                  {viewEvent.participants && (
+                    <p><span className="font-semibold">Participants:</span> {viewEvent.participants}</p>
+                  )}
+                  {viewEvent.focus && (
+                    <p><span className="font-semibold">Focus:</span> {viewEvent.focus}</p>
+                  )}
+                  {viewEvent.theme && (
+                    <p><span className="font-semibold">Theme:</span> {viewEvent.theme}</p>
+                  )}
+                  {(viewEvent as any).link && (
+                    <p className="truncate">
+                      <span className="font-semibold">Link:</span>{" "}
+                      <a
+                        href={(viewEvent as any).link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 underline break-all"
+                      >
+                        {(viewEvent as any).link}
+                      </a>
+                    </p>
+                  )}
+                </div>
+              </div>
+              {viewEvent.highlight && (
+                <div>
+                  <h3 className="text-sm font-semibold mb-1">Highlights</h3>
+                  <p className="text-sm text-muted-foreground whitespace-pre-line">
+                    {viewEvent.highlight}
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

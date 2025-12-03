@@ -11,6 +11,7 @@ export interface AdminBlog {
   isActive?: boolean;
   publishedAt?: string;
   createdAt?: string;
+  link?: string;
 }
 
 export function useBlogs(params: {
@@ -39,6 +40,7 @@ export function useBlogs(params: {
           isActive: b.isActive,
           publishedAt: b.publishedAt,
           createdAt: b.createdAt,
+          link: b.link,
         }));
         setBlogs(items);
         setPagination(res.data.pagination || null);
@@ -53,7 +55,7 @@ export function useBlogs(params: {
   }, [key]);
 
   const createBlog = useCallback(async (data: Omit<AdminBlog,'id'>) => {
-    const payload: any = { title: data.title, content: data.content, coverImage: data.coverImage, tags: data.tags, status: data.status, isActive: data.isActive };
+    const payload: any = { title: data.title, content: data.content, coverImage: data.coverImage, tags: data.tags, status: data.status, isActive: data.isActive, link: data.link };
     const res = await apiClient.createBlog(payload);
     if (res.success) await fetchBlogs();
     return res;
@@ -61,7 +63,7 @@ export function useBlogs(params: {
 
   const updateBlog = useCallback(async (id: string, data: Partial<AdminBlog>) => {
     const payload: any = {};
-    ['title','content','coverImage','tags','status','isActive'].forEach((k) => {
+    ['title','content','coverImage','tags','status','isActive','link'].forEach((k) => {
       if ((data as any)[k] !== undefined) (payload as any)[k] = (data as any)[k];
     });
     const res = await apiClient.updateBlog(id, payload);

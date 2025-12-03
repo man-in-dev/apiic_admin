@@ -17,6 +17,7 @@ export interface Event {
   date: string;
   type: EventType;
   venue?: string;
+  link?: string;
   speaker?: string;
   mode?: "In-person" | "Online" | "Hybrid";
   audience?: string;

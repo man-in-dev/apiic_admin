@@ -7,6 +7,7 @@ export interface AdminProgram {
   duration?: string;
   bullets: string[];
   isActive?: boolean;
+  link?: string;
 }
 
 interface UseProgramsParams {
@@ -38,6 +39,7 @@ export function usePrograms(params: UseProgramsParams = {}) {
           duration: p.duration,
           bullets: p.bullets || [],
           isActive: p.isActive,
+          link: p.link,
         }));
         setPrograms(items);
         setPagination(res.data.pagination || null);
@@ -52,7 +54,7 @@ export function usePrograms(params: UseProgramsParams = {}) {
   }, [key]);
 
   const createProgram = useCallback(async (data: Omit<AdminProgram,'id'>) => {
-    const payload = { title: data.title, duration: data.duration, bullets: data.bullets, isActive: data.isActive };
+    const payload = { title: data.title, duration: data.duration, bullets: data.bullets, isActive: data.isActive, link: data.link };
     const res = await apiClient.createProgram(payload);
     if (res.success) await fetchPrograms();
     return res;
@@ -64,6 +66,7 @@ export function usePrograms(params: UseProgramsParams = {}) {
     if (data.duration !== undefined) payload.duration = data.duration;
     if (data.bullets !== undefined) payload.bullets = data.bullets;
     if (data.isActive !== undefined) payload.isActive = data.isActive;
+    if (data.link !== undefined) payload.link = data.link;
     const res = await apiClient.updateProgram(id, payload);
     if (res.success) await fetchPrograms();
     return res;
