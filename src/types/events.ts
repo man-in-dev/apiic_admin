@@ -34,6 +34,7 @@ export interface Event {
   eligibility?: string;
   modules?: string;
   highlight?: string;
+  image?: string;
   status: "upcoming" | "ongoing" | "completed" | "cancelled";
   createdAt: string;
   updatedAt: string;

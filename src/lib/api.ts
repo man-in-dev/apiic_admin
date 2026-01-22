@@ -599,6 +599,38 @@ class ApiClient {
     return this.request<any>(endpoint);
   }
 
+  // Upload methods
+  async uploadImage(file: File): Promise<ApiResponse<{ url: string; filename: string }>> {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const url = `${this.baseURL}/upload/image`;
+    const headers: Record<string, string> = {};
+
+    if (this.token) {
+      headers.Authorization = `Bearer ${this.token}`;
+    }
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers,
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Image upload failed');
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Image upload error:', error);
+      throw error;
+    }
+  }
+
   // Health check
   async healthCheck(): Promise<ApiResponse<any>> {
     return this.request<any>('/health');

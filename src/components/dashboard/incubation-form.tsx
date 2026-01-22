@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  X, 
-  Save, 
+import {
+  X,
+  Save,
   Plus,
   Calendar,
   Mail,
@@ -16,7 +16,10 @@ import {
   Award,
   DollarSign,
   FileText,
-  CheckCircle
+  CheckCircle,
+  Upload,
+  Image as ImageIcon,
+  Trash2
 } from "lucide-react";
 
 // Simple Badge component
@@ -85,7 +88,8 @@ export interface IncubationApplication {
   collaborationRequired: boolean;
   collaborationDept: string;
   futureVision: string;
-  
+  image?: string;
+
   // Application Status
   applicationType: "incubation" | "pre-incubation";
   applicationStatus: "submitted" | "under-review" | "approved" | "rejected" | "incubated" | "graduated" | "exited";
@@ -195,7 +199,8 @@ export function IncubationForm({ application, onSave, onCancel, isOpen }: Incuba
     collaborationRequired: application?.collaborationRequired || false,
     collaborationDept: application?.collaborationDept || "",
     futureVision: application?.futureVision || "",
-    
+    image: application?.image || "",
+
     applicationType: application?.applicationType || "incubation",
     applicationStatus: application?.applicationStatus || "submitted",
     currentStage: application?.currentStage || "pre-incubation",
@@ -212,6 +217,56 @@ export function IncubationForm({ application, onSave, onCancel, isOpen }: Incuba
     createdAt: application?.createdAt || new Date().toISOString(),
     updatedAt: new Date().toISOString()
   });
+
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const cloudinaryRef = useRef<any>();
+  const widgetRef = useRef<any>();
+
+  useEffect(() => {
+    // Initialize Cloudinary upload widget
+    if (typeof window !== 'undefined' && (window as any).cloudinary) {
+      cloudinaryRef.current = (window as any).cloudinary;
+      widgetRef.current = cloudinaryRef.current.createUploadWidget(
+        {
+          cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'your-cloud-name',
+          uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'your-upload-preset',
+          maxFiles: 1,
+          maxFileSize: 5000000, // 5MB
+          folder: 'incubation-applications',
+          sources: ['local', 'url', 'camera'],
+          multiple: false,
+          cropping: true,
+          croppingAspectRatio: 16 / 9,
+          showSkipCropButton: false,
+          croppingShowBackButton: true,
+        },
+        (error: any, result: any) => {
+          if (error) {
+            console.error('Upload error:', error);
+            return;
+          }
+
+          if (result && result.event === 'success') {
+            handleInputChange("image", result.info.secure_url);
+            setUploadingImage(false);
+          }
+
+          if (result && result.event === 'close') {
+            setUploadingImage(false);
+          }
+        }
+      );
+    }
+  }, []);
+
+  const openImageUpload = () => {
+    setUploadingImage(true);
+    widgetRef.current?.open();
+  };
+
+  const removeImage = () => {
+    handleInputChange("image", "");
+  };
 
   const handleInputChange = (field: keyof IncubationApplication, value: string | number | boolean | string[]) => {
     setFormData(prev => ({
@@ -276,7 +331,8 @@ export function IncubationForm({ application, onSave, onCancel, isOpen }: Incuba
       collaborationRequired: formData.collaborationRequired || false,
       collaborationDept: formData.collaborationDept || "",
       futureVision: formData.futureVision || "",
-      
+      image: formData.image || "",
+
       applicationType: (formData.applicationType as "incubation" | "pre-incubation") || "incubation",
       applicationStatus: formData.applicationStatus as IncubationApplication["applicationStatus"] || "pending",
       currentStage: formData.currentStage as IncubationApplication["currentStage"] || "application",
@@ -440,6 +496,67 @@ export function IncubationForm({ application, onSave, onCancel, isOpen }: Incuba
                 onChange={(e) => handleInputChange("innovationDescription", e.target.value)}
               />
             </div>
+
+            {/* Image Upload */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Innovation Image (Optional)</label>
+              <div className="space-y-3">
+                {formData.image ? (
+                  <div className="relative">
+                    <div className="aspect-video w-full max-w-md border border-gray-200 rounded-lg overflow-hidden bg-gray-50">
+                      <img
+                        src={formData.image}
+                        alt="Innovation preview"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="mt-2 flex gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={openImageUpload}
+                        disabled={uploadingImage}
+                        className="flex items-center gap-2"
+                      >
+                        <Upload className="h-4 w-4" />
+                        {uploadingImage ? 'Uploading...' : 'Change Image'}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={removeImage}
+                        className="flex items-center gap-2 text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Remove
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+                    <ImageIcon className="mx-auto h-12 w-12 text-gray-400" />
+                    <div className="mt-4">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={openImageUpload}
+                        disabled={uploadingImage}
+                        className="flex items-center gap-2 mx-auto"
+                      >
+                        <Upload className="h-4 w-4" />
+                        {uploadingImage ? 'Uploading...' : 'Upload Image'}
+                      </Button>
+                      <p className="mt-2 text-sm text-gray-500">
+                        PNG, JPG, GIF up to 5MB
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
             <div className="space-y-2">
               <label className="text-sm font-medium">Potential Areas of Applications</label>
               <textarea

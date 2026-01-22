@@ -21,6 +21,10 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
           rel="stylesheet"
         />
+        <script
+          src="https://upload-widget.cloudinary.com/global/all.js"
+          type="text/javascript"
+        ></script>
       </head>
       <body className="font-sans">
         <AuthProvider>

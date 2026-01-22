@@ -1,7 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    basePath: '/apiic_admin',
-    assetPrefix: '/apiic_admin/',
     env: {
         API_BASE_URL: process.env.API_BASE_URL || 'http://localhost:3000/api',
     },

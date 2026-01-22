@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 // import { Badge } from "@/components/ui/badge";
-import { 
-  X, 
+import {
+  X,
   Calendar,
   MapPin,
   Users,
@@ -17,7 +17,10 @@ import {
   Video,
   Bell,
   Save,
-  Plus
+  Plus,
+  Upload,
+  Image as ImageIcon,
+  Trash2
 } from "lucide-react";
 // import {
 //   Select,
@@ -36,14 +39,14 @@ const Badge = ({ children, variant = "default", className = "" }: { children: Re
 );
 
 // Simple Select components with proper state management
-const Select = ({ children, value, onValueChange, eventTypeLabels }: { 
-  children: React.ReactNode; 
-  value: string; 
+const Select = ({ children, value, onValueChange, eventTypeLabels }: {
+  children: React.ReactNode;
+  value: string;
   onValueChange: (value: string) => void;
   eventTypeLabels?: Record<string, string>;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  
+
   // Close dropdown when clicking outside
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -61,25 +64,25 @@ const Select = ({ children, value, onValueChange, eventTypeLabels }: {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isOpen]);
-  
+
   const handleItemClick = (itemValue: string) => {
     onValueChange(itemValue);
     setIsOpen(false);
   };
-  
+
   return (
     <div className="relative select-container">
       {React.Children.map(children, child => {
         if (React.isValidElement(child)) {
           if (child.type === SelectTrigger) {
-            return React.cloneElement(child, { 
-              isOpen, 
-              setIsOpen, 
-              value, 
+            return React.cloneElement(child, {
+              isOpen,
+              setIsOpen,
+              value,
               eventTypeLabels
             } as any);
           } else if (child.type === SelectContent) {
-            return React.cloneElement(child, { 
+            return React.cloneElement(child, {
               isOpen,
               onItemClick: handleItemClick
             } as any);
@@ -91,15 +94,15 @@ const Select = ({ children, value, onValueChange, eventTypeLabels }: {
   );
 };
 
-const SelectTrigger = ({ children, className = "", isOpen, setIsOpen, value, eventTypeLabels }: { 
-  children: React.ReactNode; 
-  className?: string; 
-  isOpen?: boolean; 
+const SelectTrigger = ({ children, className = "", isOpen, setIsOpen, value, eventTypeLabels }: {
+  children: React.ReactNode;
+  className?: string;
+  isOpen?: boolean;
   setIsOpen?: (open: boolean) => void;
   value?: string;
   eventTypeLabels?: Record<string, string>;
 }) => (
-  <div 
+  <div
     className={`flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm cursor-pointer ${className}`}
     onClick={() => setIsOpen?.(!isOpen)}
   >
@@ -112,15 +115,15 @@ const SelectTrigger = ({ children, className = "", isOpen, setIsOpen, value, eve
   </div>
 );
 
-const SelectValue = ({ placeholder, value, eventTypeLabels }: { 
-  placeholder: string; 
-  value?: string; 
+const SelectValue = ({ placeholder, value, eventTypeLabels }: {
+  placeholder: string;
+  value?: string;
   eventTypeLabels?: Record<string, string>;
 }) => {
-  const displayValue = value === "all" ? "All Types" : 
-                      value && eventTypeLabels?.[value] ? eventTypeLabels[value] : 
-                      value || placeholder;
-  
+  const displayValue = value === "all" ? "All Types" :
+    value && eventTypeLabels?.[value] ? eventTypeLabels[value] :
+      value || placeholder;
+
   return (
     <span className={value ? "text-foreground" : "text-muted-foreground"}>
       {displayValue}
@@ -128,13 +131,13 @@ const SelectValue = ({ placeholder, value, eventTypeLabels }: {
   );
 };
 
-const SelectContent = ({ children, isOpen, onItemClick }: { 
-  children: React.ReactNode; 
+const SelectContent = ({ children, isOpen, onItemClick }: {
+  children: React.ReactNode;
   isOpen?: boolean;
   onItemClick?: (value: string) => void;
 }) => {
   if (!isOpen) return null;
-  
+
   return (
     <div className="absolute top-full left-0 right-0 z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border bg-white text-foreground shadow-md mt-1">
       {React.Children.map(children, child => {
@@ -147,13 +150,13 @@ const SelectContent = ({ children, isOpen, onItemClick }: {
   );
 };
 
-const SelectItem = ({ children, value, onItemClick }: { 
-  children: React.ReactNode; 
-  value: string; 
+const SelectItem = ({ children, value, onItemClick }: {
+  children: React.ReactNode;
+  value: string;
   onItemClick?: (value: string) => void;
 }) => (
-  <div 
-    className="relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none hover:bg-gray-100" 
+  <div
+    className="relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none hover:bg-gray-100"
     onClick={() => onItemClick?.(value)}
   >
     {children}
@@ -170,7 +173,7 @@ interface EventFormProps {
 const eventTypeLabels: Record<EventType, string> = {
   "workshop": "Workshop",
   "seminar": "Seminar",
-  "webinar": "Webinar", 
+  "webinar": "Webinar",
   "outreach": "Outreach",
   "collaboration": "Collaboration",
   "hackathon": "Hackathon",
@@ -215,8 +218,59 @@ export function EventForm({ event, onSave, onCancel, isOpen }: EventFormProps) {
     eligibility: event?.eligibility || "",
     modules: event?.modules || "",
     highlight: event?.highlight || "",
+    image: event?.image || "",
     status: event?.status || "upcoming",
   });
+
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const cloudinaryRef = useRef<any>();
+  const widgetRef = useRef<any>();
+
+  useEffect(() => {
+    // Initialize Cloudinary upload widget
+    if (typeof window !== 'undefined' && (window as any).cloudinary) {
+      cloudinaryRef.current = (window as any).cloudinary;
+      widgetRef.current = cloudinaryRef.current.createUploadWidget(
+        {
+          cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dhlxxn6o8',
+          uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'apiic_upload',
+          maxFiles: 1,
+          maxFileSize: 5000000, // 5MB
+          folder: 'events',
+          sources: ['local', 'url', 'camera'],
+          multiple: false,
+          cropping: true,
+          croppingAspectRatio: 16 / 9,
+          showSkipCropButton: false,
+          croppingShowBackButton: true,
+        },
+        (error: any, result: any) => {
+          if (error) {
+            console.error('Upload error:', error);
+            return;
+          }
+
+          if (result && result.event === 'success') {
+            handleInputChange("image", result.info.secure_url);
+            setUploadingImage(false);
+          }
+
+          if (result && result.event === 'close') {
+            setUploadingImage(false);
+          }
+        }
+      );
+    }
+  }, []);
+
+  const openImageUpload = () => {
+    setUploadingImage(true);
+    widgetRef.current?.open();
+  };
+
+  const removeImage = () => {
+    handleInputChange("image", "");
+  };
 
   // Sync when a different event is opened for editing
   useEffect(() => {
@@ -244,6 +298,7 @@ export function EventForm({ event, onSave, onCancel, isOpen }: EventFormProps) {
       eligibility: event?.eligibility || "",
       modules: event?.modules || "",
       highlight: event?.highlight || "",
+      image: event?.image || "",
       status: (event?.status as any) || "upcoming",
     });
   }, [event, isOpen]);
@@ -285,6 +340,7 @@ export function EventForm({ event, onSave, onCancel, isOpen }: EventFormProps) {
       eligibility: formData.eligibility,
       modules: formData.modules,
       highlight: formData.highlight,
+      image: formData.image,
       status: formData.status as "upcoming" | "ongoing" | "completed" | "cancelled",
       createdAt: event?.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -295,7 +351,7 @@ export function EventForm({ event, onSave, onCancel, isOpen }: EventFormProps) {
 
   const getFieldsForEventType = (type: EventType) => {
     const baseFields = ["title", "description", "date", "venue", "link", "status"];
-    
+
     switch (type) {
       case "workshop":
         return [...baseFields, "duration", "sessions", "certification", "eligibility", "modules"];
@@ -353,7 +409,7 @@ export function EventForm({ event, onSave, onCancel, isOpen }: EventFormProps) {
           {/* Basic Information */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Basic Information</h3>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Event Type *</label>
@@ -410,6 +466,66 @@ export function EventForm({ event, onSave, onCancel, isOpen }: EventFormProps) {
                 placeholder="Enter event description"
                 className="min-h-[100px]"
               />
+            </div>
+
+            {/* Image Upload */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Event Image (Optional)</label>
+              <div className="space-y-3">
+                {formData.image ? (
+                  <div className="relative">
+                    <div className="aspect-video w-full max-w-md border border-gray-200 rounded-lg overflow-hidden bg-gray-50">
+                      <img
+                        src={formData.image}
+                        alt="Event preview"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="mt-2 flex gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={openImageUpload}
+                        disabled={uploadingImage}
+                        className="flex items-center gap-2"
+                      >
+                        <Upload className="h-4 w-4" />
+                        {uploadingImage ? 'Uploading...' : 'Change Image'}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={removeImage}
+                        className="flex items-center gap-2 text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Remove
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+                    <ImageIcon className="mx-auto h-12 w-12 text-gray-400" />
+                    <div className="mt-4">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={openImageUpload}
+                        disabled={uploadingImage}
+                        className="flex items-center gap-2 mx-auto"
+                      >
+                        <Upload className="h-4 w-4" />
+                        {uploadingImage ? 'Uploading...' : 'Upload Image'}
+                      </Button>
+                      <p className="mt-2 text-sm text-gray-500">
+                        PNG, JPG, GIF up to 5MB
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

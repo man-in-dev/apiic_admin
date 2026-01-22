@@ -1,19 +1,22 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { 
-  X, 
-  Save, 
-  Eye, 
+import {
+  X,
+  Save,
+  Eye,
   Calendar,
   Link,
   MessageSquare,
-  AlertCircle
+  AlertCircle,
+  Upload,
+  Image as ImageIcon,
+  Trash2
 } from "lucide-react";
 
 export interface AnnouncementFormData {
@@ -25,6 +28,7 @@ export interface AnnouncementFormData {
   isActive: boolean;
   publishedAt?: string;
   expiresAt?: string;
+  image?: string;
 }
 
 interface AnnouncementFormProps {
@@ -48,12 +52,12 @@ const priorityOptions = [
   { value: 'urgent', label: 'Urgent', color: 'bg-red-100 text-red-800' }
 ];
 
-export default function AnnouncementForm({ 
-  initialData, 
-  onSubmit, 
-  onCancel, 
+export default function AnnouncementForm({
+  initialData,
+  onSubmit,
+  onCancel,
   loading = false,
-  mode 
+  mode
 }: AnnouncementFormProps) {
   const [formData, setFormData] = useState<AnnouncementFormData>({
     title: initialData?.title || '',
@@ -63,10 +67,60 @@ export default function AnnouncementForm({
     priority: initialData?.priority || 'medium',
     isActive: initialData?.isActive ?? true,
     publishedAt: initialData?.publishedAt || '',
-    expiresAt: initialData?.expiresAt || ''
+    expiresAt: initialData?.expiresAt || '',
+    image: initialData?.image || ''
   });
 
   const [errors, setErrors] = useState<Partial<AnnouncementFormData>>({});
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const cloudinaryRef = useRef<any>();
+  const widgetRef = useRef<any>();
+
+  useEffect(() => {
+    // Initialize Cloudinary upload widget
+    if (typeof window !== 'undefined' && (window as any).cloudinary) {
+      cloudinaryRef.current = (window as any).cloudinary;
+      widgetRef.current = cloudinaryRef.current.createUploadWidget(
+        {
+          cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dhlxxn6o8',
+          uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'apiic_upload',
+          maxFiles: 1,
+          maxFileSize: 5000000, // 5MB
+          folder: 'announcements',
+          sources: ['local', 'url', 'camera'],
+          multiple: false,
+          cropping: true,
+          croppingAspectRatio: 16 / 9,
+          showSkipCropButton: false,
+          croppingShowBackButton: true,
+        },
+        (error: any, result: any) => {
+          if (error) {
+            console.error('Upload error:', error);
+            return;
+          }
+
+          if (result && result.event === 'success') {
+            handleInputChange('image', result.info.secure_url);
+            setUploadingImage(false);
+          }
+
+          if (result && result.event === 'close') {
+            setUploadingImage(false);
+          }
+        }
+      );
+    }
+  }, []);
+
+  const openImageUpload = () => {
+    setUploadingImage(true);
+    widgetRef.current?.open();
+  };
+
+  const removeImage = () => {
+    handleInputChange('image', '');
+  };
 
   const validateForm = (): boolean => {
     console.log('Validating form with data:', formData);
@@ -205,6 +259,68 @@ export default function AnnouncementForm({
                     <p className="text-sm text-red-500 mt-1">{errors.link}</p>
                   )}
                 </div>
+
+                {/* Image Upload */}
+                <div>
+                  <label className="text-sm font-medium text-gray-700">
+                    Image (Optional)
+                  </label>
+                  <div className="mt-1 space-y-3">
+                    {formData.image ? (
+                      <div className="relative">
+                        <div className="aspect-video w-full max-w-md border border-gray-200 rounded-lg overflow-hidden bg-gray-50">
+                          <img
+                            src={formData.image}
+                            alt="Announcement preview"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="mt-2 flex gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={openImageUpload}
+                            disabled={uploadingImage}
+                            className="flex items-center gap-2"
+                          >
+                            <Upload className="h-4 w-4" />
+                            {uploadingImage ? 'Uploading...' : 'Change Image'}
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={removeImage}
+                            className="flex items-center gap-2 text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            Remove
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+                        <ImageIcon className="mx-auto h-12 w-12 text-gray-400" />
+                        <div className="mt-4">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={openImageUpload}
+                            disabled={uploadingImage}
+                            className="flex items-center gap-2 mx-auto"
+                          >
+                            <Upload className="h-4 w-4" />
+                            {uploadingImage ? 'Uploading...' : 'Upload Image'}
+                          </Button>
+                          <p className="mt-2 text-sm text-gray-500">
+                            PNG, JPG, GIF up to 5MB
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
@@ -322,6 +438,15 @@ export default function AnnouncementForm({
               </CardHeader>
               <CardContent>
                 <div className="border rounded-lg p-4 bg-gray-50">
+                  {formData.image && (
+                    <div className="mb-4">
+                      <img
+                        src={formData.image}
+                        alt="Announcement preview"
+                        className="w-full max-w-md h-32 object-cover rounded-lg"
+                      />
+                    </div>
+                  )}
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-semibold text-lg">{formData.title || 'Announcement Title'}</h3>
                     <div className="flex gap-2">
@@ -337,9 +462,9 @@ export default function AnnouncementForm({
                     {formData.description || 'Announcement description will appear here...'}
                   </p>
                   {formData.link && (
-                    <a 
-                      href={formData.link} 
-                      target="_blank" 
+                    <a
+                      href={formData.link}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:underline flex items-center"
                     >

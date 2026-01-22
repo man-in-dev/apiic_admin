@@ -7,11 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useAnnouncements } from "@/hooks/useApi";
 import AnnouncementForm, { AnnouncementFormData } from "@/components/dashboard/announcement-form";
-import { 
-  Search, 
-  Eye, 
-  Edit, 
-  Trash2, 
+import {
+  Search,
+  Eye,
+  Edit,
+  Trash2,
   Plus,
   Calendar,
   User,
@@ -35,6 +35,7 @@ interface Announcement {
   isActive: boolean;
   publishedAt?: string;
   expiresAt?: string;
+  image?: string;
   createdAt: string;
   updatedAt: string;
   createdBy: {
@@ -115,7 +116,7 @@ export default function AnnouncementManagementPage() {
       sortBy: 'createdAt',
       sortOrder: 'desc'
     };
-    
+
     fetchAnnouncements(params);
     fetchStatsData();
   }, [currentPage, searchTerm, statusFilter, priorityFilter]);
@@ -169,7 +170,7 @@ export default function AnnouncementManagementPage() {
 
   const handleUpdateAnnouncement = async (data: AnnouncementFormData) => {
     if (!editingAnnouncement) return;
-    
+
     try {
       await updateAnnouncement(editingAnnouncement._id, data);
       setEditingAnnouncement(null);
@@ -319,8 +320,8 @@ export default function AnnouncementManagementPage() {
               />
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              <select 
-                value={statusFilter} 
+              <select
+                value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value as Announcement["status"] | "all")}
                 className="px-3 py-2 border border-input bg-background rounded-md text-sm"
               >
@@ -329,8 +330,8 @@ export default function AnnouncementManagementPage() {
                   <option key={value} value={value}>{label}</option>
                 ))}
               </select>
-              <select 
-                value={priorityFilter} 
+              <select
+                value={priorityFilter}
                 onChange={(e) => setPriorityFilter(e.target.value as Announcement["priority"] | "all")}
                 className="px-3 py-2 border border-input bg-background rounded-md text-sm"
               >
@@ -437,7 +438,7 @@ export default function AnnouncementManagementPage() {
               </tbody>
             </table>
           </div>
-          
+
           {/* Pagination Controls */}
           {pagination && pagination.totalPages > 1 && (
             <div className="flex items-center justify-between mt-4">
@@ -484,7 +485,7 @@ export default function AnnouncementManagementPage() {
                   ×
                 </Button>
               </div>
-              
+
               <div className="space-y-6">
                 {/* Basic Information */}
                 <div>
@@ -499,9 +500,9 @@ export default function AnnouncementManagementPage() {
                     <div>
                       <label className="text-sm font-medium text-gray-700">Link</label>
                       <p className="text-sm mt-1 p-2 bg-gray-50 border rounded">
-                        <a 
-                          href={viewingAnnouncement.link} 
-                          target="_blank" 
+                        <a
+                          href={viewingAnnouncement.link}
+                          target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-600 hover:underline"
                         >

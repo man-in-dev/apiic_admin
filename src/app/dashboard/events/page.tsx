@@ -274,6 +274,7 @@ export default function EventsManagementPage() {
     eligibility: e.eligibility,
     modules: e.modules,
     highlight: e.highlight,
+    image: e.image,
     status: e.status,
   });
 
