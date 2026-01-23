@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/apiic_api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
 // Types for API responses
 export interface ApiResponse<T> {
@@ -64,7 +64,7 @@ class ApiClient {
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseURL}${endpoint}`;
-    
+
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       ...options.headers as Record<string, string>,
@@ -169,10 +169,10 @@ class ApiClient {
         }
       });
     }
-    
+
     const queryString = queryParams.toString();
     const endpoint = queryString ? `/pre-incubation?${queryString}` : '/pre-incubation';
-    
+
     return this.request<PaginatedResponse<any>>(endpoint);
   }
 
@@ -223,10 +223,10 @@ class ApiClient {
         }
       });
     }
-    
+
     const queryString = queryParams.toString();
     const endpoint = queryString ? `/incubation?${queryString}` : '/incubation';
-    
+
     return this.request<PaginatedResponse<any>>(endpoint);
   }
 
@@ -304,10 +304,10 @@ class ApiClient {
         }
       });
     }
-    
+
     const queryString = queryParams.toString();
     const endpoint = queryString ? `/announcement?${queryString}` : '/announcement';
-    
+
     return this.request<any>(endpoint);
   }
 
@@ -437,10 +437,10 @@ class ApiClient {
         }
       });
     }
-    
+
     const queryString = queryParams.toString();
     const endpoint = queryString ? `/event?${queryString}` : '/event';
-    
+
     return this.request<any>(endpoint);
   }
 
@@ -513,10 +513,10 @@ class ApiClient {
         }
       });
     }
-    
+
     const queryString = queryParams.toString();
     const endpoint = queryString ? `/admin/admins?${queryString}` : '/admin/admins';
-    
+
     return this.request<any>(endpoint);
   }
 
@@ -542,10 +542,10 @@ class ApiClient {
         }
       });
     }
-    
+
     const queryString = queryParams.toString();
     const endpoint = queryString ? `/mentor?${queryString}` : '/mentor';
-    
+
     return this.request<any>(endpoint);
   }
 
@@ -592,10 +592,10 @@ class ApiClient {
         }
       });
     }
-    
+
     const queryString = queryParams.toString();
     const endpoint = queryString ? `/mentor/public/list?${queryString}` : '/mentor/public/list';
-    
+
     return this.request<any>(endpoint);
   }
 

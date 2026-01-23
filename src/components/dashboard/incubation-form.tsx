@@ -8,15 +8,7 @@ import {
   X,
   Save,
   Plus,
-  Calendar,
-  Mail,
-  Phone,
   Building2,
-  Users,
-  Award,
-  DollarSign,
-  FileText,
-  CheckCircle,
   Upload,
   Image as ImageIcon,
   Trash2
@@ -31,7 +23,7 @@ const Badge = ({ children, variant = "default", className = "" }: { children: Re
 
 export interface IncubationApplication {
   id?: string;
-  
+
   // Applicant Details
   applicantName: string;
   applicantEmail: string;
@@ -40,7 +32,7 @@ export interface IncubationApplication {
   contactDetails: string;
   entityType: "startup" | "individual";
   companyRegistrationDetails: string;
-  
+
   // Innovation Details
   innovationTitle: string;
   prototypeTime: string;
@@ -51,29 +43,29 @@ export interface IncubationApplication {
   businessModel: string;
   rndStatus: string;
   trlStatus: string;
-  
+
   // Team & IP
   teamMembers: string;
   patents: string;
   awards: string;
-  
+
   // Incubation Requirements
   requestedPeriod: string;
   spaceRequested: string;
   equipmentRequired: string;
   otherIncubator: string;
-  
+
   // Compliance & Ethics
   clinicalSamples: string;
   biosafetyClearance: string;
   employeesOnsite: number;
-  
+
   // Financials & Support
   fundRaised: string;
   annualTurnover: string;
   incubationHelp: string;
   documents: string;
-  
+
   // Pre-incubation specific
   isStudent: boolean;
   ideationMentorship: boolean;
@@ -81,7 +73,7 @@ export interface IncubationApplication {
   prototypeSupport: boolean;
   businessPlanning: boolean;
   ecosystemExposure: boolean;
-  
+
   // Additional Information
   priorFunding: boolean;
   fundingDetails: string;
@@ -98,17 +90,17 @@ export interface IncubationApplication {
   approvedAt?: string;
   startDate?: string;
   endDate?: string;
-  
+
   // Current Status
   currentStage: "pre-incubation" | "incubation" | "graduated" | "exited";
   status: "active" | "inactive" | "graduated" | "exited";
-  
+
   // Progress Tracking
   fundingReceived?: number;
   employees?: number;
   achievements?: string[];
   milestones?: string[];
-  
+
   createdAt: string;
   updatedAt: string;
 }
@@ -158,7 +150,7 @@ export function IncubationForm({ application, onSave, onCancel, isOpen }: Incuba
     contactDetails: application?.contactDetails || "",
     entityType: application?.entityType || "startup",
     companyRegistrationDetails: application?.companyRegistrationDetails || "",
-    
+
     innovationTitle: application?.innovationTitle || "",
     prototypeTime: application?.prototypeTime || "",
     category: application?.category || "Process",
@@ -168,32 +160,32 @@ export function IncubationForm({ application, onSave, onCancel, isOpen }: Incuba
     businessModel: application?.businessModel || "",
     rndStatus: application?.rndStatus || "",
     trlStatus: application?.trlStatus || "",
-    
+
     teamMembers: application?.teamMembers || "",
     patents: application?.patents || "",
     awards: application?.awards || "",
-    
+
     requestedPeriod: application?.requestedPeriod || "",
     spaceRequested: application?.spaceRequested || "",
     equipmentRequired: application?.equipmentRequired || "",
     otherIncubator: application?.otherIncubator || "",
-    
+
     clinicalSamples: application?.clinicalSamples || "",
     biosafetyClearance: application?.biosafetyClearance || "",
     employeesOnsite: application?.employeesOnsite || 0,
-    
+
     fundRaised: application?.fundRaised || "",
     annualTurnover: application?.annualTurnover || "",
     incubationHelp: application?.incubationHelp || "",
     documents: application?.documents || "",
-    
+
     isStudent: application?.isStudent || false,
     ideationMentorship: application?.ideationMentorship || false,
     labAccess: application?.labAccess || false,
     prototypeSupport: application?.prototypeSupport || false,
     businessPlanning: application?.businessPlanning || false,
     ecosystemExposure: application?.ecosystemExposure || false,
-    
+
     priorFunding: application?.priorFunding || false,
     fundingDetails: application?.fundingDetails || "",
     collaborationRequired: application?.collaborationRequired || false,
@@ -208,12 +200,12 @@ export function IncubationForm({ application, onSave, onCancel, isOpen }: Incuba
     submittedAt: application?.submittedAt || new Date().toISOString(),
     startDate: application?.startDate || "",
     endDate: application?.endDate || "",
-    
+
     fundingReceived: application?.fundingReceived || 0,
     employees: application?.employees || 0,
     achievements: application?.achievements || [],
     milestones: application?.milestones || [],
-    
+
     createdAt: application?.createdAt || new Date().toISOString(),
     updatedAt: new Date().toISOString()
   });
@@ -235,10 +227,10 @@ export function IncubationForm({ application, onSave, onCancel, isOpen }: Incuba
           folder: 'incubation-applications',
           sources: ['local', 'url', 'camera'],
           multiple: false,
-          cropping: true,
-          croppingAspectRatio: 16 / 9,
-          showSkipCropButton: false,
-          croppingShowBackButton: true,
+          // cropping: true,
+          // croppingAspectRatio: 16 / 9,
+          // showSkipCropButton: false,
+          // croppingShowBackButton: true,
         },
         (error: any, result: any) => {
           if (error) {
@@ -290,7 +282,7 @@ export function IncubationForm({ application, onSave, onCancel, isOpen }: Incuba
       contactDetails: formData.contactDetails || "",
       entityType: (formData.entityType as "startup" | "individual") || "startup",
       companyRegistrationDetails: formData.companyRegistrationDetails || "",
-      
+
       innovationTitle: formData.innovationTitle || "",
       prototypeTime: formData.prototypeTime || "",
       category: (formData.category as "Process" | "Product" | "New Application" | "Other") || "Process",
@@ -300,32 +292,32 @@ export function IncubationForm({ application, onSave, onCancel, isOpen }: Incuba
       businessModel: formData.businessModel || "",
       rndStatus: formData.rndStatus || "",
       trlStatus: formData.trlStatus || "",
-      
+
       teamMembers: formData.teamMembers || "",
       patents: formData.patents || "",
       awards: formData.awards || "",
-      
+
       requestedPeriod: formData.requestedPeriod || "",
       spaceRequested: formData.spaceRequested || "",
       equipmentRequired: formData.equipmentRequired || "",
       otherIncubator: formData.otherIncubator || "",
-      
+
       clinicalSamples: formData.clinicalSamples || "",
       biosafetyClearance: formData.biosafetyClearance || "",
       employeesOnsite: formData.employeesOnsite || 0,
-      
+
       fundRaised: formData.fundRaised || "",
       annualTurnover: formData.annualTurnover || "",
       incubationHelp: formData.incubationHelp || "",
       documents: formData.documents || "",
-      
+
       isStudent: formData.isStudent || false,
       ideationMentorship: formData.ideationMentorship || false,
       labAccess: formData.labAccess || false,
       prototypeSupport: formData.prototypeSupport || false,
       businessPlanning: formData.businessPlanning || false,
       ecosystemExposure: formData.ecosystemExposure || false,
-      
+
       priorFunding: formData.priorFunding || false,
       fundingDetails: formData.fundingDetails || "",
       collaborationRequired: formData.collaborationRequired || false,
@@ -340,12 +332,12 @@ export function IncubationForm({ application, onSave, onCancel, isOpen }: Incuba
       submittedAt: formData.submittedAt || new Date().toISOString(),
       startDate: formData.startDate || "",
       endDate: formData.endDate || "",
-      
+
       fundingReceived: formData.fundingReceived || 0,
       employees: formData.employees || 0,
       achievements: formData.achievements || [],
       milestones: formData.milestones || [],
-      
+
       createdAt: formData.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
@@ -382,7 +374,7 @@ export function IncubationForm({ application, onSave, onCancel, isOpen }: Incuba
           </Button>
         </CardHeader>
         <CardContent className="space-y-8">
-          
+
           {/* 1. Applicant Details Section */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-primary">Applicant Details</h3>
@@ -422,7 +414,7 @@ export function IncubationForm({ application, onSave, onCancel, isOpen }: Incuba
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium">Startup / Individual</label>
-                <select 
+                <select
                   className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm"
                   value={formData.entityType}
                   onChange={(e) => handleInputChange("entityType", e.target.value)}
@@ -474,7 +466,7 @@ export function IncubationForm({ application, onSave, onCancel, isOpen }: Incuba
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium">Category Of Technology / Innovation</label>
-                <select 
+                <select
                   className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm"
                   value={formData.category}
                   onChange={(e) => handleInputChange("category", e.target.value)}
@@ -851,7 +843,7 @@ export function IncubationForm({ application, onSave, onCancel, isOpen }: Incuba
                   />
                 )}
               </div>
-              
+
               <div className="space-y-2">
                 <label className="text-sm font-medium">Require collaboration with AIIMS Patna departments?</label>
                 <div className="flex items-center space-x-4">
@@ -884,7 +876,7 @@ export function IncubationForm({ application, onSave, onCancel, isOpen }: Incuba
                   />
                 )}
               </div>
-              
+
               <div className="space-y-2">
                 <label className="text-sm font-medium">Future Plans & Vision (100 words)</label>
                 <textarea
@@ -903,7 +895,7 @@ export function IncubationForm({ application, onSave, onCancel, isOpen }: Incuba
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Application Type *</label>
-                <select 
+                <select
                   className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm"
                   value={formData.applicationType}
                   onChange={(e) => handleInputChange("applicationType", e.target.value)}
@@ -915,7 +907,7 @@ export function IncubationForm({ application, onSave, onCancel, isOpen }: Incuba
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium">Application Status *</label>
-                <select 
+                <select
                   className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm"
                   value={formData.applicationStatus}
                   onChange={(e) => handleInputChange("applicationStatus", e.target.value)}
@@ -927,7 +919,7 @@ export function IncubationForm({ application, onSave, onCancel, isOpen }: Incuba
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium">Current Stage *</label>
-                <select 
+                <select
                   className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm"
                   value={formData.currentStage}
                   onChange={(e) => handleInputChange("currentStage", e.target.value)}

@@ -239,10 +239,10 @@ export function EventForm({ event, onSave, onCancel, isOpen }: EventFormProps) {
           folder: 'events',
           sources: ['local', 'url', 'camera'],
           multiple: false,
-          cropping: true,
-          croppingAspectRatio: 16 / 9,
-          showSkipCropButton: false,
-          croppingShowBackButton: true,
+          // cropping: true,
+          // croppingAspectRatio: 16 / 9,
+          // showSkipCropButton: false,
+          // croppingShowBackButton: true,
         },
         (error: any, result: any) => {
           if (error) {
